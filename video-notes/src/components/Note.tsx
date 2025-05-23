@@ -1,4 +1,6 @@
+import { useState } from 'react'
 import type { Note as NoteType } from '../types/Note'
+import { RichTextEditor } from './RichTextEditor'
 
 interface NoteProps {
   note: NoteType;
@@ -9,25 +11,46 @@ interface NoteProps {
 }
 
 export function Note({ note, onEdit, onDelete, onAdd, index }: NoteProps) {
+  const [isEditing, setIsEditing] = useState(false);
+
   const formatTime = (seconds: number): string => {
     const minutes = Math.floor(seconds / 60);
     const remainingSeconds = seconds % 60;
     return `${minutes}:${remainingSeconds.toString().padStart(2, '0')}`;
   };
 
+  const handleEdit = () => {
+    setIsEditing(true);
+  };
+
+  const handleSave = (content: string) => {
+    onEdit(note.id, content);
+    setIsEditing(false);
+  };
+
   return (
     <div className="note-item">
       <div className="note-content">
-        <p>{note.content}</p>
+        {isEditing ? (
+          <RichTextEditor
+            content={note.content}
+            onChange={handleSave}
+            onBlur={() => setIsEditing(false)}
+          />
+        ) : (
+          <div 
+            className="note-text" 
+            dangerouslySetInnerHTML={{ __html: note.content }}
+            onClick={handleEdit}
+          />
+        )}
         <p className="timestamp">
           {formatTime(note.startTime)} - {formatTime(note.endTime)}
         </p>
       </div>
       <div className="note-actions">
         <button onClick={() => onAdd(index)}>Add</button>
-        <button onClick={() => onEdit(note.id, prompt('Edit note:', note.content) || note.content)}>
-          Edit
-        </button>
+        <button onClick={handleEdit}>Edit</button>
         <button onClick={() => onDelete(note.id)}>Delete</button>
       </div>
     </div>

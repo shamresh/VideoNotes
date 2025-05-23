@@ -1,0 +1,51 @@
+.rich-text-editor {
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  background-color: white;
+}
+
+.editor-toolbar {
+  padding: 0.5rem;
+  border-bottom: 1px solid #ccc;
+  display: flex;
+  gap: 0.5rem;
+}
+
+.editor-toolbar button {
+  padding: 0.25rem 0.5rem;
+  font-size: 0.875rem;
+  background-color: #f8f9fa;
+  border: 1px solid #dee2e6;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.editor-toolbar button:hover {
+  background-color: #e9ecef;
+}
+
+.editor-toolbar button.is-active {
+  background-color: #007bff;
+  color: white;
+  border-color: #0056b3;
+}
+
+.ProseMirror {
+  padding: 1rem;
+  min-height: 100px;
+  outline: none;
+}
+
+.ProseMirror p {
+  margin: 0;
+}
+
+.ProseMirror ul {
+  margin: 0;
+  padding-left: 1.5rem;
+}
+
+.ProseMirror h2 {
+  margin: 1rem 0 0.5rem;
+  font-size: 1.5rem;
+} 
