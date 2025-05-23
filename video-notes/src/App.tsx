@@ -1,4 +1,3 @@
-import React from 'react'
 import { VideoNotes } from './components/VideoNotes'
 import './App.css'
 

@@ -263,3 +263,118 @@ src/
    - NoteItem component
 2. Add proper form handling for note editing
 3. Implement timestamp synchronization with video
+
+### Build Process Notes (2025-05-23)
+1. **React Import Changes**
+   - Removed unused `import React from 'react'` from components
+   - Modern React (17+) doesn't require React import for JSX
+   - TypeScript warns about unused imports during build
+
+2. **Build Process (`npm run build`)**
+   - **Step 1:** TypeScript compilation (`tsc -b`)
+   - **Step 2:** Vite build process
+     - Bundles all source files
+     - Minifies code
+     - Optimizes assets
+     - Creates `dist` folder
+
+3. **What Gets Bundled**
+   - Only used code from your source files
+   - Only used dependencies from `node_modules`
+   - Tree-shaking removes unused code
+   - Results in optimized files in `dist/assets/`
+
+4. **Output Structure**
+   ```
+   dist/
+   ├── assets/           # Bundled and optimized files
+   │   ├── index.js     # Main JavaScript bundle
+   │   └── index.css    # CSS bundle
+   ├── index.html       # Processed HTML
+   └── ...              # Other assets
+   ```
+
+5. **Key Points**
+   - Not all `node_modules` are included
+   - Only used dependencies are bundled
+   - Multiple optimized files, not one giant file
+   - Static files from `public/` are copied as-is
+
+### Production Deployment Notes (2025-05-23)
+1. **Running Production Build**
+   - Use `npm run preview` to test production build locally
+   - Runs on port 4173 by default (different from dev server's 5173)
+   - Command: `npm run preview -- --port 3000` to use a specific port
+
+2. **Bundle Files**
+   - Vite generates unique filenames with hashes (e.g., `index-a1b2c3.js`)
+   - Hash changes when content changes (for cache busting)
+   - `index.html` automatically references the correct bundle
+   - Example structure:
+     ```
+     dist/
+     ├── assets/
+     │   ├── index-a1b2c3.js    # Main bundle
+     │   ├── vendor-x7y8z9.js   # Third-party dependencies
+     │   └── index-d4e5f6.css   # Styles
+     └── index.html             # References correct bundles
+     ```
+
+3. **How Bundle Loading Works**
+   - `index.html` contains the correct paths to bundles
+   - Vite updates these paths during build
+   - No manual configuration needed
+   - Example from index.html:
+     ```html
+     <script type="module" src="/assets/index-a1b2c3.js"></script>
+     ```
+
+4. **Multiple Bundles**
+   - Main app code → `index-xxx.js`
+   - Third-party dependencies → `vendor-xxx.js`
+   - CSS → `index-xxx.css`
+   - Assets (images, etc.) → `asset-xxx.ext`
+
+5. **Deployment**
+   - Copy entire `dist` folder to web server
+   - No need to run a Node.js server
+   - Can be hosted on any static file server
+   - Example: GitHub Pages, Netlify, Vercel, etc.
+
+6. **Cache Busting**
+   - **What it is:** A technique to force browsers to load new versions of files
+   - **How it works:** 
+     - Each build generates unique hashes for files
+     - When you update your code, the hash changes
+     - Browser sees new filename and loads fresh copy
+   - **Why it's needed:**
+     - Browsers cache files to load faster
+     - Without cache busting, users might see old versions
+     - Hash changes = new file to browser = fresh content
+
+7. **Bundle Creation with Many Components**
+   - **Single Bundle Approach (Default)**
+     - All components → one `index-xxx.js`
+     - Pros: Fewer HTTP requests, faster initial load
+     - Cons: Larger initial download
+   
+   - **Code Splitting (Optional)**
+     - Components can be split into separate bundles
+     - Example structure:
+       ```
+       dist/assets/
+       ├── index-xxx.js          # Main app code
+       ├── vendor-xxx.js         # Third-party code
+       ├── component1-xxx.js     # Split component
+       ├── component2-xxx.js     # Split component
+       └── index-xxx.css         # Styles
+       ```
+     - How to split: Use dynamic imports
+       ```typescript
+       // Instead of: import BigComponent from './BigComponent'
+       const BigComponent = React.lazy(() => import('./BigComponent'))
+       ```
+     - Benefits:
+       - Load components only when needed
+       - Smaller initial bundle
+       - Better performance for large apps
