@@ -3,13 +3,23 @@ import { useState, useRef, useEffect } from 'react';
 interface TimeSelectionOverlayProps {
   videoDuration: number;
   onTimeChange: (startTime: number, endTime: number) => void;
+  startTime: number;
+  endTime: number;
 }
 
-export function TimeSelectionOverlay({ videoDuration, onTimeChange }: TimeSelectionOverlayProps) {
-  const [startTime, setStartTime] = useState(0);
-  const [endTime, setEndTime] = useState(videoDuration);
+export function TimeSelectionOverlay({ videoDuration, onTimeChange, startTime, endTime }: TimeSelectionOverlayProps) {
+  const [internalStartTime, setInternalStartTime] = useState(startTime);
+  const [internalEndTime, setInternalEndTime] = useState(endTime);
   const [isDragging, setIsDragging] = useState<'start' | 'end' | null>(null);
   const overlayRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    setInternalStartTime(startTime);
+  }, [startTime]);
+
+  useEffect(() => {
+    setInternalEndTime(endTime);
+  }, [endTime]);
 
   const formatTime = (seconds: number): string => {
     const minutes = Math.floor(seconds / 60);
@@ -30,13 +40,13 @@ export function TimeSelectionOverlay({ videoDuration, onTimeChange }: TimeSelect
     const time = Math.max(0, Math.min(videoDuration, position * videoDuration));
 
     if (isDragging === 'start') {
-      const newStartTime = Math.min(time, endTime - 1);
-      setStartTime(newStartTime);
-      onTimeChange(newStartTime, endTime);
+      const newStartTime = Math.min(time, internalEndTime - 1);
+      setInternalStartTime(newStartTime);
+      onTimeChange(newStartTime, internalEndTime);
     } else {
-      const newEndTime = Math.max(time, startTime + 1);
-      setEndTime(newEndTime);
-      onTimeChange(startTime, newEndTime);
+      const newEndTime = Math.max(time, internalStartTime + 1);
+      setInternalEndTime(newEndTime);
+      onTimeChange(internalStartTime, newEndTime);
     }
   };
 
@@ -75,7 +85,7 @@ export function TimeSelectionOverlay({ videoDuration, onTimeChange }: TimeSelect
         onMouseDown={(e) => handleMouseDown(e, 'start')}
         style={{
           position: 'absolute',
-          left: `${(startTime / videoDuration) * 100}%`,
+          left: `${(internalStartTime / videoDuration) * 100}%`,
           top: '50%',
           transform: 'translate(-50%, -50%)',
           width: '12px',
@@ -97,7 +107,7 @@ export function TimeSelectionOverlay({ videoDuration, onTimeChange }: TimeSelect
           fontSize: '12px',
           whiteSpace: 'nowrap',
         }}>
-          {formatTime(startTime)}
+          {formatTime(internalStartTime)}
         </div>
       </div>
       <div
@@ -105,7 +115,7 @@ export function TimeSelectionOverlay({ videoDuration, onTimeChange }: TimeSelect
         onMouseDown={(e) => handleMouseDown(e, 'end')}
         style={{
           position: 'absolute',
-          left: `${(endTime / videoDuration) * 100}%`,
+          left: `${(internalEndTime / videoDuration) * 100}%`,
           top: '50%',
           transform: 'translate(-50%, -50%)',
           width: '12px',
@@ -127,15 +137,15 @@ export function TimeSelectionOverlay({ videoDuration, onTimeChange }: TimeSelect
           fontSize: '12px',
           whiteSpace: 'nowrap',
         }}>
-          {formatTime(endTime)}
+          {formatTime(internalEndTime)}
         </div>
       </div>
       <div
         className="selection-range"
         style={{
           position: 'absolute',
-          left: `${(startTime / videoDuration) * 100}%`,
-          right: `${100 - (endTime / videoDuration) * 100}%`,
+          left: `${(internalStartTime / videoDuration) * 100}%`,
+          right: `${100 - (internalEndTime / videoDuration) * 100}%`,
           top: 0,
           bottom: 0,
           backgroundColor: 'rgba(255, 255, 255, 0.3)',

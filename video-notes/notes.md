@@ -1994,3 +1994,105 @@ In this code:
     - Add loading states
     - Consider adding tests
     - Implement proper accessibility
+
+Let's break down how `useEffect` is used in your `VideoPlayer` component. You have two distinct `useEffect` calls, each serving a specific purpose.
+
+### Understanding the `useEffect` Hooks in `VideoPlayer`
+
+#### 1. `useEffect` for YouTube Player Initialization and Cleanup
+
+```typescript
+  useEffect(() => {
+    // Load YouTube API
+    const tag = document.createElement('script');
+    tag.src = 'https://www.youtube.com/iframe_api'; // This URL seems incorrect, should be YouTube's API URL
+    const firstScriptTag = document.getElementsByTagName('script')[0];
+    firstScriptTag.parentNode?.insertBefore(tag, firstScriptTag);
+
+    // Initialize player when API is ready
+    window.onYouTubeIframeAPIReady = () => {
+      playerRef.current = new window.YT.Player(containerRef.current, {
+        height: '315',
+        width: '560',
+        videoId,
+        playerVars: {
+          'playsinline': 1,
+          'controls': 1
+        },
+        events: {
+          'onReady': onPlayerReady,
+          'onStateChange': onPlayerStateChange
+        }
+      });
+    };
+
+    return () => {
+      if (playerRef.current) {
+        playerRef.current.destroy();
+      }
+    };
+  }, [videoId]);
+```
+
+**Purpose:** This `useEffect` is responsible for loading the YouTube Iframe API script, initializing the YouTube player once the API is ready, and then cleaning up the player when the `VideoPlayer` component unmounts or the `videoId` changes.
+
+**Breakdown:**
+
+* **`useEffect(() => { ... }, [videoId]);`**
+    * **Callback Function (the "effect"):** This function contains the logic to:
+        1.  **Load the YouTube Iframe API script:** It dynamically creates a `<script>` tag and inserts it into the HTML document. This script makes the `window.YT` object and `window.onYouTubeIframeAPIReady` callback available globally.
+            * **Minor Correction:** The `tag.src` URL `https://www.youtube.com/iframe_api` appears to be incorrect. The correct URL for the YouTube Iframe API is typically `https://www.youtube.com/iframe_api`. If your player isn't loading, this is likely the reason.
+        2.  **Set `window.onYouTubeIframeAPIReady`:** This global callback function is what the YouTube API calls when it's fully loaded. Inside this callback, your code initializes a new `YT.Player` instance, attaching it to the `div` element referenced by `containerRef.current`. It also passes the `videoId` and sets up event handlers (`onPlayerReady`, `onPlayerStateChange`).
+    * **Dependency Array: `[videoId]`**
+        * This is crucial. It tells React to re-run this effect **only when the `videoId` prop changes**.
+        * If `videoId` changes (meaning you want to load a different video), the previous player will be destroyed (via the cleanup function), and a new one will be initialized with the new video ID.
+        * If `videoId` *doesn't* change, this effect will only run once when the component mounts.
+    * **Cleanup Function (`return () => { ... }`):**
+        * This function is returned from the effect. React will execute it when the component unmounts (e.g., if you navigate away from the page where `VideoPlayer` is rendered) or *before* the effect re-runs (if `videoId` changes).
+        * **`playerRef.current.destroy();`**: This is essential for preventing memory leaks and ensuring proper resource management. It cleans up the YouTube player instance, removing its DOM elements and event listeners.
+
+**When it runs:**
+* Immediately after the first render of `VideoPlayer`.
+* Whenever the `videoId` prop changes.
+* The cleanup function runs right before the component unmounts, or before the effect re-runs due to `videoId` change.
+
+---
+
+#### 2. `useEffect` for Exposing `seekTo` to Parent Component
+
+```typescript
+  // Expose the seekTo method to parent component
+  useEffect(() => {
+    if (playerRef.current) {
+      const seekTo = (time: number) => {
+        playerRef.current.seekTo(time);
+        playerRef.current.playVideo();
+      };
+      onTimeChange(seekTo);
+    }
+  }, [onTimeChange]);
+```
+
+**Purpose:** This `useEffect` is designed to provide the parent component with a way to control the video player's seek functionality.
+
+**Breakdown:**
+
+* **`useEffect(() => { ... }, [onTimeChange]);`**
+    * **Callback Function (the "effect"):**
+        1.  **`if (playerRef.current)`:** It first checks if the YouTube player instance (`playerRef.current`) has been successfully initialized by the *first* `useEffect`. This ensures you don't try to call methods on a non-existent player.
+        2.  **`const seekTo = (time: number) => { ... };`:** It defines a `seekTo` function specific to this component's player. This function encapsulates the logic to seek the video (`playerRef.current.seekTo(time)`) and then immediately play it (`playerRef.current.playVideo()`).
+        3.  **`onTimeChange(seekTo);`:** This is the core of this effect. It calls the `onTimeChange` prop function (passed from the parent) and passes *this component's `seekTo` function* to the parent. This allows the parent to later call `seekTo(someTime)` to control the player in this `VideoPlayer` component.
+    * **Dependency Array: `[onTimeChange]`**
+        * This effect runs when `onTimeChange` prop changes. In typical React applications, prop functions are stable, so this effect will usually run once after the component mounts and `playerRef.current` is available.
+        * **Important Note:** If `onTimeChange` were to be a function that gets re-created on every parent render without `useCallback`, this `useEffect` would also re-run unnecessarily, potentially causing performance issues if the exposed `seekTo` function were being used in a way that reacted to its identity changing. However, for a simple exposure like this, it's generally fine.
+
+**When it runs:**
+* Immediately after the first render of `VideoPlayer`, but effectively after the `playerRef.current` is populated by the *first* `useEffect` (since the `if (playerRef.current)` condition must be met).
+* Whenever the `onTimeChange` prop function itself changes (which usually means the parent component re-defined it, ideally wrapped in `useCallback` to prevent unnecessary re-runs).
+
+### Summary of `useEffect` Usage in Your Code
+
+* **First `useEffect` (dependencies `[videoId]`):** Manages the **lifecycle of the external YouTube Player**. It loads the API, creates the player, and ensures it's properly destroyed when no longer needed or when the video changes. This is a classic "synchronize with external system" use case.
+* **Second `useEffect` (dependencies `[onTimeChange]`):** Synchronizes the **internal `seekTo` capability** of this component with its **parent via a prop callback**. It ensures the parent always has access to the correct `seekTo` function for the active player.
+
+Both uses are appropriate for `useEffect` as they involve interacting with elements or functions outside the immediate rendering logic of the `VideoPlayer` component.

@@ -91,6 +91,15 @@ export function VideoNotes() {
     return `${minutes}:${remainingSeconds.toString().padStart(2, '0')}`;
   };
 
+  const playNote = (startTime: number, endTime: number) => {
+    console.log('playNote called with:', startTime, endTime);
+    if (seekTo) {
+      seekTo(startTime);
+    }
+    setSelectedStartTime(startTime);
+    setSelectedEndTime(endTime);
+  };
+
   return (
     <div className="video-notes">
       <div className="video-section">
@@ -100,6 +109,8 @@ export function VideoNotes() {
           onTimeChange={handleSeekToChange}
           videoDuration={videoDuration}
           onTimeRangeChange={handleTimeRangeChange}
+          selectedStartTime={selectedStartTime}
+          selectedEndTime={selectedEndTime}
         />
       </div>
       <div style={{ display: 'flex', justifyContent: 'center', margin: '1rem 0' }}>
@@ -117,6 +128,7 @@ export function VideoNotes() {
             onAdd={handleAddNote}
             onEdit={handleEditNote}
             onDelete={handleDeleteNote}
+            onPlay={playNote}
           />
         ))}
       </div>

@@ -14,9 +14,11 @@ interface VideoPlayerProps {
   onTimeChange: (seekTo: (time: number) => void) => void;
   videoDuration: number;
   onTimeRangeChange: (startTime: number, endTime: number) => void;
+  selectedStartTime: number;
+  selectedEndTime: number;
 }
 
-export function VideoPlayer({ videoId, onDurationChange, onTimeChange, videoDuration, onTimeRangeChange }: VideoPlayerProps) {
+export function VideoPlayer({ videoId, onDurationChange, onTimeChange, videoDuration, onTimeRangeChange, selectedStartTime, selectedEndTime }: VideoPlayerProps) {
   const playerRef = useRef<any>(null);
   const containerRef = useRef<HTMLDivElement>(null);
   const prevStartTimeRef = useRef<number>(0);
@@ -53,23 +55,19 @@ export function VideoPlayer({ videoId, onDurationChange, onTimeChange, videoDura
   }, [videoId]);
 
   const onPlayerReady = (event: any) => {
+    console.log('YouTube Player is ready');
     onDurationChange(event.target.getDuration());
+    const seekTo = (time: number) => {
+      console.log('seekTo called with:', time);
+      event.target.seekTo(time);
+      event.target.playVideo();
+    };
+    onTimeChange(seekTo);
   };
 
   const onPlayerStateChange = (event: any) => {
     // Handle player state changes if needed
   };
-
-  // Expose the seekTo method to parent component
-  useEffect(() => {
-    if (playerRef.current) {
-      const seekTo = (time: number) => {
-        playerRef.current.seekTo(time);
-        playerRef.current.playVideo();
-      };
-      onTimeChange(seekTo);
-    }
-  }, [onTimeChange]);
 
   const handleTimeChange = (startTime: number, endTime: number) => {
     if (!playerRef.current) return;
@@ -89,6 +87,8 @@ export function VideoPlayer({ videoId, onDurationChange, onTimeChange, videoDura
       <TimeSelectionOverlay
         videoDuration={videoDuration}
         onTimeChange={handleTimeChange}
+        startTime={selectedStartTime}
+        endTime={selectedEndTime}
       />
     </div>
   );
