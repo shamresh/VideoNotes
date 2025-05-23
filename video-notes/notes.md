@@ -1631,53 +1631,41 @@ By doing this, `setNotes` receives a brand new array where only the specific not
 ### Understanding Props, State, and Callbacks in React
 
 1. **What are Props?**
-   - Props (Properties) are read-only data passed to components
-   - Like function parameters, but for components
-   - Can be any JavaScript value (strings, numbers, objects, functions)
-   ```typescript
-   // Parent component
-   function Parent() {
-     const [count, setCount] = useState(0);
-     
-     return (
-       <Child 
-         count={count}           // Passing state as prop
-         onIncrement={() => setCount(count + 1)}  // Passing callback
-       />
-     );
-   }
-   
-   // Child component
-   function Child({ count, onIncrement }) {
-     return (
-       <div>
-         <p>Count: {count}</p>
-         <button onClick={onIncrement}>Increment</button>
-       </div>
-     );
-   }
-   ```
+   - Props (short for "properties") are how you pass data from a parent component to a child component in React.
+   - They are read-only for the child. The child can use them, but cannot change them directly.
 
-2. **Props are Read-Only**
-   ```typescript
-   // ❌ Wrong: Trying to modify props directly
-   function Child({ count }) {
-     count = count + 1;  // Error: Cannot assign to 'count' because it is a read-only property
-     return <div>{count}</div>;
-   }
-   
-   // ✅ Correct: Use callbacks to update parent state
-   function Child({ count, onIncrement }) {
-     return (
-       <div>
-         <p>Count: {count}</p>
-         <button onClick={onIncrement}>Increment</button>
-       </div>
-     );
-   }
-   ```
+2. **Passing state and callbacks as props:**
+   - If you pass a piece of state (like `notes` or `count`) as a prop, the child can only read it, not change it.
+   - If you want the child to be able to request a change to the parent's state, you must also pass a callback function (like `onEdit`, `onAdd`, or `onIncrement`) as a prop.
+   - The child calls this callback to "ask" the parent to update its state.
 
-3. **State vs Props**
+3. **Example:**
+```tsx
+// Parent
+function Parent() {
+  const [count, setCount] = useState(0);
+  return (
+    <Child 
+      count={count}           // Passing state as prop
+      onIncrement={() => setCount(count + 1)}  // Passing callback
+    />
+  );
+}
+
+// Child
+function Child({ count, onIncrement }) {
+  return (
+    <div>
+      <p>Count: {count}</p>
+      <button onClick={onIncrement}>Increment</button>
+    </div>
+  );
+}
+```
+- The child cannot do `count++` or `count = 5` (that would be an error).
+- The only way for the child to change the parent's state is to call the callback (`onIncrement`).
+
+4. **State vs Props**
    ```typescript
    // Parent Component (State Owner)
    function Parent() {
@@ -1712,7 +1700,7 @@ By doing this, `setNotes` receives a brand new array where only the specific not
    }
    ```
 
-4. **Callback Pattern**
+5. **Callback Pattern**
    ```typescript
    // Parent: Defines state and callback
    function VideoNotes() {
@@ -1742,7 +1730,7 @@ By doing this, `setNotes` receives a brand new array where only the specific not
    }
    ```
 
-5. **One-Way Data Flow**
+6. **One-Way Data Flow**
    ```
    Parent Component
    │
@@ -1757,13 +1745,13 @@ By doing this, `setNotes` receives a brand new array where only the specific not
        └── Calls onEdit to request state change
    ```
 
-6. **Why This Pattern?**
+7. **Why This Pattern?**
    - **Predictability**: Data flows in one direction
    - **Maintainability**: State changes are centralized
    - **Debugging**: Easier to track state changes
    - **Performance**: React can optimize renders
 
-7. **Real Example from VideoNotes**
+8. **Real Example from VideoNotes**
    ```typescript
    // VideoNotes (Parent)
    export function VideoNotes() {
@@ -1793,60 +1781,100 @@ By doing this, `setNotes` receives a brand new array where only the specific not
    }
    ```
 
-8. **Best Practices**
+9. **Best Practices**
    - Keep state as high as needed in the component tree
    - Pass callbacks down to children
    - Never modify props directly
    - Use callbacks to request state changes
    - Keep components focused on their responsibilities
 
- 
- I'll add a section explaining props, state, and callbacks in React:
+### Time Selection Overlay Implementation (2024-03-26)
+1. **New TimeSelectionOverlay Component**
+   - Created `src/components/TimeSelectionOverlay.tsx`
+   - Implements draggable time selection points
+   - Shows time tooltips for start and end times
+   - Visual selection range between handles
+   - Prevents invalid time ranges (start > end)
 
+2. **Component Features**
+   - Draggable handles for start and end times
+   - Real-time time display in tooltips
+   - Visual feedback for selected range
+   - Smooth drag interaction
+   - Responsive to video duration
 
+3. **Integration with VideoNotes**
+   - Added video duration state
+   - Positioned overlay above video controls
+   - Time change callback for future note integration
+   - Relative positioning for proper overlay placement
 
+4. **Technical Details**
+   - Uses React refs for DOM measurements
+   - Implements mouse event handling
+   - Calculates time based on drag position
+   - Formats time display (MM:SS)
+   - Handles edge cases (min/max times)
 
-Here’s a clear explanation, as you requested:
+5. **Next Steps**
+   - Integrate with YouTube Player API for actual duration
+   - Connect time selection to note creation
+   - Add keyboard controls for precise time selection
+   - Implement time range validation
+   - Add visual feedback for current playback position
 
-**What are props?**
-- Props (short for “properties”) are how you pass data from a parent component to a child component in React.
-- They are read-only for the child. The child can use them, but cannot change them directly.
+## CSS Positioning Explained
 
-**Passing state and callbacks as props:**
-- If you pass a piece of state (like `notes` or `count`) as a prop, the child can only read it, not change it.
-- If you want the child to be able to request a change to the parent’s state, you must also pass a callback function (like `onEdit`, `onAdd`, or `onIncrement`) as a prop.
-- The child calls this callback to “ask” the parent to update its state.
+### Relative vs Absolute Positioning
 
-**Example:**
+CSS positioning is a way to control where elements are placed on a webpage. Let's understand the two most common types:
+
+1. **Relative Positioning**
+- When you set `position: relative` on an element, it positions the element relative to its normal position in the document flow
+- Think of it like saying "move this element a bit from where it would normally be"
+- The element still takes up space in the normal document flow
+- You can use `top`, `right`, `bottom`, and `left` properties to move it from its original position
+
+2. **Absolute Positioning**
+- When you set `position: absolute` on an element, it removes the element from the normal document flow
+- The element is positioned relative to its nearest positioned ancestor (an ancestor with `position: relative`, `absolute`, `fixed`, or `sticky`)
+- If there's no positioned ancestor, it positions relative to the viewport (browser window)
+- The element doesn't take up space in the normal document flow (other elements act like it's not there)
+
+### Real Example from Our Code
 ```tsx
-// Parent
-function Parent() {
-  const [count, setCount] = useState(0);
-  return (
-    <Child
-      count={count} // state as prop (read-only in child)
-      onIncrement={() => setCount(count + 1)} // callback as prop
-    />
-  );
-}
-
-// Child
-function Child({ count, onIncrement }) {
-  // count is read-only here!
-  return (
-    <div>
-      <p>{count}</p>
-      <button onClick={onIncrement}>Increment</button>
-    </div>
-  );
-}
+<div className="video-container" style={{ position: 'relative' }}>
+  <iframe
+    ref={videoRef}
+    width="560"
+    height="315"
+  />
+  <TimeSelectionOverlay />
+</div>
 ```
-- The child cannot do `count++` or `count = 5` (that would be an error).
-- The only way for the child to change the parent’s state is to call the callback (`onIncrement`).
 
-**Summary:**  
-- Props are always read-only in the child.
-- To let a child “change” parent state, pass a callback as a prop.
-- The child calls the callback, and the parent updates its own state.
+In this code:
+1. The `video-container` div has `position: relative`
+2. This creates a positioning context for any absolutely positioned children
+3. The `TimeSelectionOverlay` component can be absolutely positioned relative to this container
 
-This is a core React pattern and is called “one-way data flow.” If you want, I can add more real-world examples or diagrams to your notes!
+### Simple Analogy
+- Think of `position: relative` like setting up a coordinate system on a piece of paper
+- `position: absolute` is like placing a sticker on that paper - the sticker's position is measured from the edges of the paper (the relative container)
+
+### Common Use Cases
+- `position: relative` is often used to:
+  - Create a positioning context for absolute elements
+  - Make small adjustments to an element's position
+  - Keep the element in the normal document flow
+
+- `position: absolute` is often used for:
+  - Overlays (like our `TimeSelectionOverlay`)
+  - Tooltips
+  - Dropdown menus
+  - Any element that needs to be positioned precisely without affecting other elements
+
+### Key Points to Remember
+1. `position: relative` keeps the element in the normal flow and creates a positioning context
+2. `position: absolute` takes the element out of the normal flow and positions it relative to its nearest positioned ancestor
+3. Always make sure an absolutely positioned element has a positioned ancestor, or it will position relative to the viewport
