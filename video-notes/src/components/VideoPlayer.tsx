@@ -1,4 +1,4 @@
-import { useRef, useEffect } from 'react';
+import { useRef, useEffect, useState } from 'react';
 import { TimeSelectionOverlay } from './TimeSelectionOverlay';
 
 declare global {
@@ -13,9 +13,10 @@ interface VideoPlayerProps {
   onDurationChange: (duration: number) => void;
   onTimeChange: (seekTo: (time: number) => void) => void;
   videoDuration: number;
+  onTimeRangeChange: (startTime: number, endTime: number) => void;
 }
 
-export function VideoPlayer({ videoId, onDurationChange, onTimeChange, videoDuration }: VideoPlayerProps) {
+export function VideoPlayer({ videoId, onDurationChange, onTimeChange, videoDuration, onTimeRangeChange }: VideoPlayerProps) {
   const playerRef = useRef<any>(null);
   const containerRef = useRef<HTMLDivElement>(null);
   const prevStartTimeRef = useRef<number>(0);
@@ -72,13 +73,11 @@ export function VideoPlayer({ videoId, onDurationChange, onTimeChange, videoDura
 
   const handleTimeChange = (startTime: number, endTime: number) => {
     if (!playerRef.current) return;
-    
     // Only proceed if start time actually changed
     if (startTime === prevStartTimeRef.current) return;
-    
     prevStartTimeRef.current = startTime;
     playerRef.current.seekTo(startTime);
-    playerRef.current.playVideo();
+    onTimeRangeChange(startTime, endTime);
   };
 
   return (

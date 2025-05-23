@@ -27,6 +27,8 @@ export function VideoNotes() {
   ]);
   const [videoDuration, setVideoDuration] = useState(0);
   const [seekTo, setSeekTo] = useState<((time: number) => void) | null>(null);
+  const [selectedStartTime, setSelectedStartTime] = useState(0);
+  const [selectedEndTime, setSelectedEndTime] = useState(0);
 
   const handleAddNote = (index: number) => {
     const newNote: Note = {
@@ -64,6 +66,27 @@ export function VideoNotes() {
     setSeekTo(() => newSeekTo);
   }, []);
 
+  const handleTimeRangeChange = (startTime: number, endTime: number) => {
+    setSelectedStartTime(startTime);
+    setSelectedEndTime(endTime);
+  };
+
+  const handleCreateNote = () => {
+    const newNote: Note = {
+      id: Date.now().toString(),
+      content: 'New Note',
+      startTime: selectedStartTime,
+      endTime: selectedEndTime
+    };
+    setNotes([...notes, newNote]);
+  };
+
+  const formatTime = (seconds: number): string => {
+    const minutes = Math.floor(seconds / 60);
+    const remainingSeconds = Math.floor(seconds % 60);
+    return `${minutes}:${remainingSeconds.toString().padStart(2, '0')}`;
+  };
+
   return (
     <div className="video-notes">
       <div className="video-section">
@@ -72,14 +95,20 @@ export function VideoNotes() {
           onDurationChange={handleDurationChange}
           onTimeChange={handleSeekToChange}
           videoDuration={videoDuration}
+          onTimeRangeChange={handleTimeRangeChange}
         />
+      </div>
+      <div style={{ display: 'flex', justifyContent: 'center', margin: '1rem 0' }}>
+        <button className="create-note-button" onClick={handleCreateNote}>
+          Create Note
+        </button>
       </div>
       <div className="notes-container">
         <h2>Notes</h2>
         {notes.map((note, index) => (
           <NoteComponent
             key={note.id}
-            note={note}
+            note={{ ...note, startTime: note.startTime, endTime: note.endTime }}
             index={index}
             onAdd={handleAddNote}
             onEdit={handleEditNote}
