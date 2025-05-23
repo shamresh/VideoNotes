@@ -2,6 +2,38 @@
 
 A React application that allows users to take timestamped notes while watching YouTube videos. Built with React, TypeScript, and Vite.
 
+## Learning Resources
+
+### Essential Concepts for This App
+
+#### React Basics
+- Components and JSX syntax
+- useState hook for managing notes data
+- Event handling (onClick events for buttons)
+- Props and component structure
+
+#### TypeScript Fundamentals
+- Basic types (string, number)
+- Interfaces (Note interface)
+- Type annotations for useState
+- Type-only imports
+
+#### Vite
+- Project structure
+- Development server (npm run dev)
+- Hot Module Replacement (HMR)
+
+#### CSS
+- Flexbox (for layout)
+- Basic styling (colors, margins, padding)
+- CSS classes and selectors
+
+### Quick Start Learning Path
+1. Learn React components and useState hook
+2. Understand TypeScript interfaces and type annotations
+3. Practice basic CSS flexbox
+4. Learn how to use the YouTube iframe API
+
 ## Features
 
 - YouTube video player integration
