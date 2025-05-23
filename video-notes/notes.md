@@ -1878,3 +1878,53 @@ In this code:
 1. `position: relative` keeps the element in the normal flow and creates a positioning context
 2. `position: absolute` takes the element out of the normal flow and positions it relative to its nearest positioned ancestor
 3. Always make sure an absolutely positioned element has a positioned ancestor, or it will position relative to the viewport
+
+### Recent Changes (2024-03-26)
+
+1. **Component Restructuring**
+   - Split video player functionality into separate components
+   - Created `VideoPlayer` component for YouTube player integration
+   - Created `TimeSelectionOverlay` component for time selection UI
+   - Improved code organization and separation of concerns
+
+2. **VideoPlayer Component**
+   - Implements YouTube Player API integration
+   - Handles video loading and initialization
+   - Manages player state and events
+   - Exposes seekTo functionality to parent
+   - Properly positions TimeSelectionOverlay
+
+3. **TimeSelectionOverlay Component**
+   - Implements draggable time selection interface
+   - Shows time tooltips for start and end times
+   - Visual feedback for selected range
+   - Prevents invalid time ranges (start > end)
+   - Smooth drag interaction with mouse events
+
+4. **VideoNotes Component Updates**
+   - Now uses VideoPlayer component instead of iframe
+   - Manages video duration state
+   - Handles time change callbacks
+   - Improved state management with useCallback
+   - Better TypeScript type safety
+
+5. **Technical Improvements**
+   - Added proper TypeScript types for YouTube API
+   - Implemented proper cleanup in useEffect hooks
+   - Added error handling for player initialization
+   - Improved component communication with callbacks
+   - Better state management patterns
+
+6. **UI/UX Enhancements**
+   - Time selection overlay positioned above video controls
+   - Visual feedback during dragging
+   - Time tooltips showing current position
+   - Smooth animations for handle movement
+   - Clear visual indication of selected range
+
+7. **Next Steps**
+   - Add keyboard controls for precise time selection
+   - Implement time range validation
+   - Add visual feedback for current playback position
+   - Consider adding more player controls
+   - Improve error handling and loading states

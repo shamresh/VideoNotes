@@ -1,7 +1,14 @@
-import { useState, useRef } from 'react'
+import { useState, useCallback } from 'react'
 import type { Note } from '../types/Note'
 import { Note as NoteComponent } from './Note'
-import { TimeSelectionOverlay } from './TimeSelectionOverlay'
+import { VideoPlayer } from './VideoPlayer'
+
+declare global {
+  interface Window {
+    YT: any;
+    onYouTubeIframeAPIReady: () => void;
+  }
+}
 
 export function VideoNotes() {
   const [notes, setNotes] = useState<Note[]>([
@@ -19,7 +26,7 @@ export function VideoNotes() {
     }
   ]);
   const [videoDuration, setVideoDuration] = useState(0);
-  const videoRef = useRef<HTMLIFrameElement>(null);
+  const [seekTo, setSeekTo] = useState<((time: number) => void) | null>(null);
 
   const handleAddNote = (index: number) => {
     const newNote: Note = {
@@ -43,32 +50,28 @@ export function VideoNotes() {
     ));
   };
 
-  const handleTimeChange = (startTime: number, endTime: number) => {
-    // You can use these values to update a note or perform other actions
-    console.log('Time range:', startTime, endTime);
-  };
+  const handleTimeChange = useCallback((startTime: number, endTime: number) => {
+    if (seekTo) {
+      seekTo(startTime);
+    }
+  }, [seekTo]);
+
+  const handleDurationChange = useCallback((duration: number) => {
+    setVideoDuration(duration);
+  }, []);
+
+  const handleSeekToChange = useCallback((newSeekTo: (time: number) => void) => {
+    setSeekTo(() => newSeekTo);
+  }, []);
 
   return (
     <div className="video-notes">
-      <div className="video-container" style={{ position: 'relative' }}>
-        <iframe
-          ref={videoRef}
-          width="560"
-          height="315"
-          src="https://www.youtube.com/embed/dQw4w9WgXcQ"
-          title="YouTube video player"
-          frameBorder="0"
-          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-          allowFullScreen
-          onLoad={() => {
-            // In a real implementation, you would get the actual video duration
-            // from the YouTube Player API
-            setVideoDuration(600); // Example: 10 minutes
-          }}
-        ></iframe>
-        <TimeSelectionOverlay
+      <div className="video-section">
+        <VideoPlayer
+          videoId="dQw4w9WgXcQ"
+          onDurationChange={handleDurationChange}
+          onTimeChange={handleSeekToChange}
           videoDuration={videoDuration}
-          onTimeChange={handleTimeChange}
         />
       </div>
       <div className="notes-container">
