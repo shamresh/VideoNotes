@@ -47,6 +47,10 @@
   padding: 2rem;
 }
 
+.video-notes {
+  margin-top: 2rem;
+}
+
 .video-container {
   margin: 2rem 0;
   display: flex;

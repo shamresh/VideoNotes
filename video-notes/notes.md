@@ -203,3 +203,63 @@ npm install -D package-name     # Development dependency
 3. **Module not found errors**
    - Run `npm install` to ensure all dependencies are installed
    - Check if the import path is correct
+
+## Development Changes Log
+
+### Component Structure Changes (2025-05-23)
+1. **Created Components Directory**
+   - Added `src/components/` directory
+   - Moved video and notes functionality to separate component
+
+2. **New VideoNotes Component**
+   - Created `src/components/VideoNotes.tsx`
+   - Contains all video player and notes functionality
+   - Manages its own state for notes
+   - Handles note operations (add, edit, delete)
+
+3. **Simplified App Component**
+   - `App.tsx` now only contains:
+     - App title
+     - VideoNotes component
+   - Removed state management from App
+   - Cleaner, more focused component structure
+
+4. **CSS Updates**
+   - Added `.video-notes` wrapper class
+   - Maintained existing styles for notes functionality
+   - Improved component isolation
+
+### Current Component Structure
+```
+src/
+├── components/
+│   └── VideoNotes.tsx    # Video and notes functionality
+├── types/
+│   └── Note.ts          # Type definitions
+├── App.tsx              # Main app component
+└── App.css              # Styles
+```
+
+### Benefits of This Change
+1. **Better Organization**
+   - Each component has a single responsibility
+   - Easier to find and modify code
+   - Clear separation of concerns
+
+2. **Improved Maintainability**
+   - Components are more focused
+   - Easier to test individual components
+   - Simpler to add new features
+
+3. **Code Reusability**
+   - VideoNotes component can be reused
+   - State management is encapsulated
+   - Easier to share components
+
+### Next Steps
+1. Consider breaking down VideoNotes into smaller components:
+   - VideoPlayer component
+   - NotesList component
+   - NoteItem component
+2. Add proper form handling for note editing
+3. Implement timestamp synchronization with video
