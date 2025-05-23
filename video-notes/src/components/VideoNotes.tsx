@@ -78,7 +78,11 @@ export function VideoNotes() {
       startTime: selectedStartTime,
       endTime: selectedEndTime
     };
-    setNotes([...notes, newNote]);
+    const updatedNotes = [...notes, newNote];
+
+    updatedNotes.sort((a, b) => a.startTime - b.startTime);
+  
+    setNotes(updatedNotes);
   };
 
   const formatTime = (seconds: number): string => {

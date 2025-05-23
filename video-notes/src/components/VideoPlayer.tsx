@@ -73,11 +73,14 @@ export function VideoPlayer({ videoId, onDurationChange, onTimeChange, videoDura
 
   const handleTimeChange = (startTime: number, endTime: number) => {
     if (!playerRef.current) return;
-    // Only proceed if start time actually changed
-    if (startTime === prevStartTimeRef.current) return;
+    // Endtime has only changed.
+    onTimeRangeChange(startTime, endTime);
+    if (startTime === prevStartTimeRef.current) {
+      return;
+    }
+    // Starttime has changed.
     prevStartTimeRef.current = startTime;
     playerRef.current.seekTo(startTime);
-    onTimeRangeChange(startTime, endTime);
   };
 
   return (
