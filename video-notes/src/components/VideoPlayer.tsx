@@ -18,6 +18,7 @@ interface VideoPlayerProps {
 export function VideoPlayer({ videoId, onDurationChange, onTimeChange, videoDuration }: VideoPlayerProps) {
   const playerRef = useRef<any>(null);
   const containerRef = useRef<HTMLDivElement>(null);
+  const prevStartTimeRef = useRef<number>(0);
 
   useEffect(() => {
     // Load YouTube API
@@ -70,10 +71,14 @@ export function VideoPlayer({ videoId, onDurationChange, onTimeChange, videoDura
   }, [onTimeChange]);
 
   const handleTimeChange = (startTime: number, endTime: number) => {
-    if (playerRef.current) {
-      playerRef.current.seekTo(startTime);
-      playerRef.current.playVideo();
-    }
+    if (!playerRef.current) return;
+    
+    // Only proceed if start time actually changed
+    if (startTime === prevStartTimeRef.current) return;
+    
+    prevStartTimeRef.current = startTime;
+    playerRef.current.seekTo(startTime);
+    playerRef.current.playVideo();
   };
 
   return (
