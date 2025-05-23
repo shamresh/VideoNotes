@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import type { Note } from '../types/Note'
+import { Note as NoteComponent } from './Note'
 
 export function VideoNotes() {
   const [notes, setNotes] = useState<Note[]>([
@@ -55,24 +56,16 @@ export function VideoNotes() {
       <div className="notes-container">
         <h2>Notes</h2>
         {notes.map((note, index) => (
-          <div key={note.id} className="note-item">
-            <div className="note-content">
-              <p>{note.content}</p>
-              <p className="timestamp">
-                {Math.floor(note.startTime / 60)}:{(note.startTime % 60).toString().padStart(2, '0')} - 
-                {Math.floor(note.endTime / 60)}:{(note.endTime % 60).toString().padStart(2, '0')}
-              </p>
-            </div>
-            <div className="note-actions">
-              <button onClick={() => handleAddNote(index)}>Add</button>
-              <button onClick={() => handleEditNote(note.id, prompt('Edit note:', note.content) || note.content)}>
-                Edit
-              </button>
-              <button onClick={() => handleDeleteNote(note.id)}>Delete</button>
-            </div>
-          </div>
+          <NoteComponent
+            key={note.id}
+            note={note}
+            index={index}
+            onAdd={handleAddNote}
+            onEdit={handleEditNote}
+            onDelete={handleDeleteNote}
+          />
         ))}
       </div>
     </div>
-  )
+  );
 } 
