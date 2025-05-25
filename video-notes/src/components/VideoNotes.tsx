@@ -37,6 +37,9 @@ export function VideoNotes() {
   const [selectedStartTime, setSelectedStartTime] = useState(0);
   const [selectedEndTime, setSelectedEndTime] = useState(0);
 
+  const showScreenCapture = import.meta.env.VITE_SHOW_SCREEN_CAPTURE === 'true';
+  const isDevelopment = import.meta.env.VITE_NODE_ENV === 'development';
+
   const handleDeleteNote = (id: string) => {
     setNotes(notes.filter(note => note.id !== id));
   };
@@ -101,7 +104,12 @@ export function VideoNotes() {
           selectedStartTime={selectedStartTime}
           selectedEndTime={selectedEndTime}
         />
-        <ScreenCapture onRecordingComplete={handleRecordingComplete} />
+        {showScreenCapture && (
+          <div style={{ marginTop: '20px' }}>
+            <h2>Screen Capture Section</h2>
+            <ScreenCapture onRecordingComplete={handleRecordingComplete} />
+          </div>
+        )}
       </div>
       <div style={{ display: 'flex', justifyContent: 'center', margin: '1rem 0' }}>
         <button className="create-note-button" onClick={handleCreateNote}>
