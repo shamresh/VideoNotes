@@ -1,6 +1,5 @@
 import { useState } from 'react'
 import type { Note as NoteType } from '../types/Note'
-import { RichTextEditor } from './RichTextEditor'
 
 interface NoteProps {
   note: NoteType;
@@ -12,6 +11,7 @@ interface NoteProps {
 
 export function Note({ note, onEdit, onDelete, index, onPlay }: NoteProps) {
   const [isEditing, setIsEditing] = useState(false);
+  const [editValue, setEditValue] = useState(note.content);
 
   const formatTime = (seconds: number): string => {
     const minutes = Math.floor(seconds / 60);
@@ -20,11 +20,12 @@ export function Note({ note, onEdit, onDelete, index, onPlay }: NoteProps) {
   };
 
   const handleEdit = () => {
+    setEditValue(note.content);
     setIsEditing(true);
   };
 
-  const handleSave = (content: string) => {
-    onEdit(note.id, content);
+  const handleSave = () => {
+    onEdit(note.id, editValue);
     setIsEditing(false);
   };
 
@@ -32,17 +33,28 @@ export function Note({ note, onEdit, onDelete, index, onPlay }: NoteProps) {
     <div className="note-item">
       <div className="note-content">
         {isEditing ? (
-          <RichTextEditor
-            content={note.content}
-            onChange={handleSave}
-            onBlur={() => setIsEditing(false)}
-          />
+          <div>
+            <textarea
+              value={editValue}
+              onChange={e => setEditValue(e.target.value)}
+              onBlur={handleSave}
+              autoFocus
+              rows={3}
+              style={{ width: '100%' }}
+            />
+            <div>
+              <button onClick={handleSave}>Save</button>
+              <button onClick={() => setIsEditing(false)}>Cancel</button>
+            </div>
+          </div>
         ) : (
           <div 
             className="note-text" 
-            dangerouslySetInnerHTML={{ __html: note.content }}
             onClick={handleEdit}
-          />
+            style={{ whiteSpace: 'pre-wrap', cursor: 'pointer' }}
+          >
+            {note.content}
+          </div>
         )}
         <p className="timestamp">
           {formatTime(note.startTime)} - {formatTime(note.endTime)}

@@ -22,7 +22,7 @@ export function VideoNotes() {
       id: '2',
       content: 'Components and Props',
       startTime: 120,
-      endTime: 240
+      endTime: 140
     }
   ]);
   const [videoDuration, setVideoDuration] = useState(0);
