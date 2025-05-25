@@ -23,29 +23,25 @@ export function VideoPlayer({ videoId, onDurationChange, onTimeChange, videoDura
   const containerRef = useRef<HTMLDivElement>(null);
   const prevStartTimeRef = useRef<number>(0);
 
+  // Initialize YouTube API
   useEffect(() => {
-    // Load YouTube API
-    const tag = document.createElement('script');
-    tag.src = 'https://www.youtube.com/iframe_api';
-    const firstScriptTag = document.getElementsByTagName('script')[0];
-    firstScriptTag.parentNode?.insertBefore(tag, firstScriptTag);
+    if (!window.YT) {
+      const tag = document.createElement('script');
+      tag.src = 'https://www.youtube.com/iframe_api';
+      const firstScriptTag = document.getElementsByTagName('script')[0];
+      firstScriptTag.parentNode?.insertBefore(tag, firstScriptTag);
+    }
+  }, []);
 
-    // Initialize player when API is ready
-    window.onYouTubeIframeAPIReady = () => {
-      playerRef.current = new window.YT.Player(containerRef.current, {
-        height: '315',
-        width: '560',
-        videoId,
-        playerVars: {
-          'playsinline': 1,
-          'controls': 1
-        },
-        events: {
-          'onReady': onPlayerReady,
-          'onStateChange': onPlayerStateChange
-        }
-      });
-    };
+  // Handle player initialization and video changes
+  useEffect(() => {
+    if (!window.YT) {
+      window.onYouTubeIframeAPIReady = () => {
+        initializePlayer();
+      };
+    } else {
+      initializePlayer();
+    }
 
     return () => {
       if (playerRef.current) {
@@ -53,6 +49,26 @@ export function VideoPlayer({ videoId, onDurationChange, onTimeChange, videoDura
       }
     };
   }, [videoId]);
+
+  const initializePlayer = () => {
+    if (playerRef.current) {
+      playerRef.current.destroy();
+    }
+
+    playerRef.current = new window.YT.Player(containerRef.current, {
+      height: '315',
+      width: '560',
+      videoId,
+      playerVars: {
+        'playsinline': 1,
+        'controls': 1
+      },
+      events: {
+        'onReady': onPlayerReady,
+        'onStateChange': onPlayerStateChange
+      }
+    });
+  };
 
   const onPlayerReady = (event: any) => {
     console.log('YouTube Player is ready');
