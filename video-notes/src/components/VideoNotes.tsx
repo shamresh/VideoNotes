@@ -2,6 +2,7 @@ import { useState, useCallback } from 'react'
 import type { Note } from '../types/Note'
 import { Note as NoteComponent } from './Note'
 import { VideoPlayer } from './VideoPlayer'
+import { ScreenCapture } from './ScreenCapture'
 
 declare global {
   interface Window {
@@ -106,6 +107,12 @@ export function VideoNotes() {
     setSelectedEndTime(endTime);
   };
 
+  const handleRecordingComplete = (blob: Blob) => {
+    // You can handle the recorded video blob here
+    // For example, you could save it to a file or upload it to a server
+    console.log('Recording completed, blob size:', blob.size);
+  };
+
   return (
     <div className="video-notes">
       <div className="video-section">
@@ -118,6 +125,7 @@ export function VideoNotes() {
           selectedStartTime={selectedStartTime}
           selectedEndTime={selectedEndTime}
         />
+        <ScreenCapture onRecordingComplete={handleRecordingComplete} />
       </div>
       <div style={{ display: 'flex', justifyContent: 'center', margin: '1rem 0' }}>
         <button className="create-note-button" onClick={handleCreateNote}>
