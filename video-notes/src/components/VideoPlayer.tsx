@@ -1,4 +1,4 @@
-import { useRef, useEffect, useState } from 'react';
+import { useRef, useEffect } from 'react';
 import { TimeSelectionOverlay } from './TimeSelectionOverlay';
 
 declare global {
@@ -65,7 +65,7 @@ export function VideoPlayer({ videoId, onDurationChange, onTimeChange, videoDura
     onTimeChange(seekTo);
   };
 
-  const onPlayerStateChange = (event: any) => {
+  const onPlayerStateChange = () => {
     // Handle player state changes if needed
   };
 

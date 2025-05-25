@@ -5,11 +5,10 @@ interface NoteProps {
   note: NoteType;
   onEdit: (id: string, content: string) => void;
   onDelete: (id: string) => void;
-  index: number;
   onPlay: (startTime: number, endTime: number) => void;
 }
 
-export function Note({ note, onEdit, onDelete, index, onPlay }: NoteProps) {
+export function Note({ note, onEdit, onDelete, onPlay }: NoteProps) {
   const [isEditing, setIsEditing] = useState(false);
   const [editValue, setEditValue] = useState(note.content);
 

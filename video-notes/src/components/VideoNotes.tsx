@@ -37,18 +37,6 @@ export function VideoNotes() {
   const [selectedStartTime, setSelectedStartTime] = useState(0);
   const [selectedEndTime, setSelectedEndTime] = useState(0);
 
-  const handleAddNote = (index: number) => {
-    const newNote: Note = {
-      id: Date.now().toString(),
-      content: 'New Note',
-      startTime: 0,
-      endTime: 0
-    };
-    const newNotes = [...notes];
-    newNotes.splice(index + 1, 0, newNote);
-    setNotes(newNotes);
-  };
-
   const handleDeleteNote = (id: string) => {
     setNotes(notes.filter(note => note.id !== id));
   };
@@ -58,12 +46,6 @@ export function VideoNotes() {
       note.id === id ? { ...note, content } : note
     ));
   };
-
-  const handleTimeChange = useCallback((startTime: number, endTime: number) => {
-    if (seekTo) {
-      seekTo(startTime);
-    }
-  }, [seekTo]);
 
   const handleDurationChange = useCallback((duration: number) => {
     setVideoDuration(duration);
@@ -90,12 +72,6 @@ export function VideoNotes() {
     updatedNotes.sort((a, b) => a.startTime - b.startTime);
   
     setNotes(updatedNotes);
-  };
-
-  const formatTime = (seconds: number): string => {
-    const minutes = Math.floor(seconds / 60);
-    const remainingSeconds = Math.floor(seconds % 60);
-    return `${minutes}:${remainingSeconds.toString().padStart(2, '0')}`;
   };
 
   const playNote = (startTime: number, endTime: number) => {
@@ -134,12 +110,10 @@ export function VideoNotes() {
       </div>
       <div className="notes-container">
         <h2>Notes</h2>
-        {notes.map((note, index) => (
+        {notes.map((note) => (
           <NoteComponent
             key={note.id}
             note={{ ...note, startTime: note.startTime, endTime: note.endTime }}
-            index={index}
-            onAdd={handleAddNote}
             onEdit={handleEditNote}
             onDelete={handleDeleteNote}
             onPlay={playNote}
