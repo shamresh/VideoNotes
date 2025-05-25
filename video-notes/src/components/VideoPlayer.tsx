@@ -82,14 +82,19 @@ export function VideoPlayer({ videoId, onDurationChange, onTimeChange, videoDura
   };
 
   return (
-    <div className="video-container" style={{ position: 'relative' }}>
-      <div ref={containerRef}></div>
-      <TimeSelectionOverlay
-        videoDuration={videoDuration}
-        onTimeChange={handleTimeChange}
-        startTime={selectedStartTime}
-        endTime={selectedEndTime}
-      />
+    <div className="video-container" style={{ position: 'relative', display: 'flex', justifyContent: 'center' }}>
+      <div style={{ position: 'relative', width: 560, height: 315 }}>
+        {/* Overlay at the bottom, full width, 20px height */}
+        <div style={{ position: 'absolute', left: 0, bottom: 0, width: 560, height: '20px', zIndex: 2, pointerEvents: 'none' }}>
+          <TimeSelectionOverlay
+            videoDuration={videoDuration}
+            onTimeChange={handleTimeChange}
+            startTime={selectedStartTime}
+            endTime={selectedEndTime}
+          />
+        </div>
+        <div ref={containerRef}></div>
+      </div>
     </div>
   );
 } 

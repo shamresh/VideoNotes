@@ -72,12 +72,15 @@ export function TimeSelectionOverlay({ videoDuration, onTimeChange, startTime, e
       onMouseMove={handleMouseMove}
       style={{
         position: 'absolute',
-        bottom: '40px',
+        width: '100%',
         left: 0,
         right: 0,
+        top: 0,
         height: '20px',
         backgroundColor: 'rgba(0, 0, 0, 0.3)',
         cursor: 'pointer',
+        pointerEvents: 'auto',
+        boxSizing: 'border-box',
       }}
     >
       <div

@@ -6,12 +6,11 @@ interface NoteProps {
   note: NoteType;
   onEdit: (id: string, content: string) => void;
   onDelete: (id: string) => void;
-  onAdd: (index: number) => void;
   index: number;
   onPlay: (startTime: number, endTime: number) => void;
 }
 
-export function Note({ note, onEdit, onDelete, onAdd, index, onPlay }: NoteProps) {
+export function Note({ note, onEdit, onDelete, index, onPlay }: NoteProps) {
   const [isEditing, setIsEditing] = useState(false);
 
   const formatTime = (seconds: number): string => {
@@ -51,7 +50,6 @@ export function Note({ note, onEdit, onDelete, onAdd, index, onPlay }: NoteProps
       </div>
       <div className="note-actions">
         <button onClick={() => onPlay(note.startTime, note.endTime)}>Play</button>
-        <button onClick={() => onAdd(index)}>Add</button>
         <button onClick={handleEdit}>Edit</button>
         <button onClick={() => onDelete(note.id)}>Delete</button>
       </div>
