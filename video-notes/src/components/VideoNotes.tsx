@@ -14,8 +14,8 @@ export function VideoNotes() {
   const [notes, setNotes] = useState<Note[]>([
     {
       id: '1',
-      content: 'Introduction to React',
-      startTime: 0,
+      content: 'Risk Astley shuffle',
+      startTime: 77,
       endTime: 120
     },
     {
@@ -23,6 +23,12 @@ export function VideoNotes() {
       content: 'Components and Props',
       startTime: 120,
       endTime: 140
+    },
+    {
+        id: '3',
+        content: 'Back flip dude',
+        startTime: 146,
+        endTime: 159
     }
   ]);
   const [videoDuration, setVideoDuration] = useState(0);
