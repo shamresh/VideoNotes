@@ -71,4 +71,14 @@ export const deleteNote = (id: string): boolean => {
   
   writeNotes(filteredNotes);
   return true;
+};
+
+export const searchNotes = (searchText: string): Note[] => {
+  const notes = readNotes();
+  const searchLower = searchText.toLowerCase();
+  
+  return notes.filter(note => 
+    note.title.toLowerCase().includes(searchLower) || 
+    note.content.toLowerCase().includes(searchLower)
+  );
 }; 

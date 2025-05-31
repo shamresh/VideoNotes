@@ -5,6 +5,7 @@ import {
   createNote,
   updateNote,
   deleteNote,
+  searchNotes,
 } from '../services/noteService';
 
 const router = Router();
@@ -27,6 +28,38 @@ const router = Router();
  */
 router.get('/', (req: Request, res: Response) => {
   const notes = getAllNotes();
+  res.json(notes);
+});
+
+/**
+ * @swagger
+ * /api/notes/search:
+ *   get:
+ *     summary: Search notes by text
+ *     tags: [Notes]
+ *     parameters:
+ *       - in: query
+ *         name: q
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: Search text to find in note title or content
+ *     responses:
+ *       200:
+ *         description: List of matching notes
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: array
+ *               items:
+ *                 $ref: '#/components/schemas/Note'
+ */
+router.get('/search', (req: Request, res: Response) => {
+  const searchText = req.query.q as string;
+  if (!searchText) {
+    return res.status(400).json({ message: 'Search query parameter "q" is required' });
+  }
+  const notes = searchNotes(searchText);
   res.json(notes);
 });
 
