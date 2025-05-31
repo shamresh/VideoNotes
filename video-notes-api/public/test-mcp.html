@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>MCP Server Test</title>
+    <style>
+        body { font-family: Arial, sans-serif; max-width: 800px; margin: 0 auto; padding: 20px; }
+        .tool-section { margin-bottom: 20px; padding: 15px; border: 1px solid #ccc; border-radius: 5px; }
+        button { padding: 8px 15px; margin: 5px; cursor: pointer; }
+        pre { background: #f5f5f5; padding: 10px; border-radius: 5px; overflow-x: auto; }
+    </style>
+</head>
+<body>
+    <h1>MCP Server Test</h1>
+    
+    <div class="tool-section">
+        <h2>Available Tools</h2>
+        <button onclick="listTools()">List Tools</button>
+        <pre id="toolsResult"></pre>
+    </div>
+
+    <div class="tool-section">
+        <h2>Search Notes</h2>
+        <input type="text" id="searchQuery" placeholder="Enter search query">
+        <button onclick="searchNotes()">Search</button>
+        <pre id="searchResult"></pre>
+    </div>
+
+    <div class="tool-section">
+        <h2>Get Note</h2>
+        <input type="text" id="noteId" placeholder="Enter note ID">
+        <button onclick="getNote()">Get Note</button>
+        <pre id="noteResult"></pre>
+    </div>
+
+    <script>
+        async function listTools() {
+            try {
+                const response = await fetch('http://localhost:3002/mcp/tools');
+                const data = await response.json();
+                document.getElementById('toolsResult').textContent = JSON.stringify(data, null, 2);
+            } catch (error) {
+                document.getElementById('toolsResult').textContent = 'Error: ' + error.message;
+            }
+        }
+
+        async function searchNotes() {
+            try {
+                const query = document.getElementById('searchQuery').value;
+                const response = await fetch('http://localhost:3002/mcp/execute', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        tool: 'search_notes',
+                        parameters: { query }
+                    })
+                });
+                const data = await response.json();
+                document.getElementById('searchResult').textContent = JSON.stringify(data, null, 2);
+            } catch (error) {
+                document.getElementById('searchResult').textContent = 'Error: ' + error.message;
+            }
+        }
+
+        async function getNote() {
+            try {
+                const id = document.getElementById('noteId').value;
+                const response = await fetch('http://localhost:3002/mcp/execute', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        tool: 'get_note',
+                        parameters: { id }
+                    })
+                });
+                const data = await response.json();
+                document.getElementById('noteResult').textContent = JSON.stringify(data, null, 2);
+            } catch (error) {
+                document.getElementById('noteResult').textContent = 'Error: ' + error.message;
+            }
+        }
+    </script>
+</body>
+</html> 
