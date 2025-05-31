@@ -8,6 +8,7 @@
     "dev:mcp": "ts-node src/mcpServer.ts",
     "dev:mcp:stdio": "ts-node src/mcpStdioServer.ts",
     "dev:mcp:interactive": "ts-node src/mcpStdioServer.ts --interactive",
+    "inspect:mcp": "npm run build && npx -y @modelcontextprotocol/inspector node dist/mcpStdioServer.js",
     "build": "tsc",
     "test": "jest",
     "test:watch": "jest --watch"
